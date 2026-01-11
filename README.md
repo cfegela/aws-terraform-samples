@@ -29,7 +29,7 @@ This project provisions the following AWS infrastructure:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `projectname` | Project name used for resource naming | `sample` |
+| `projectname` | Project name used for resource naming | `cfeg` |
 | `networkcidr` | First two octets of the VPC CIDR | `192.168` |
 | `awsregion` | AWS region for deployment | `us-east-2` |
 | `certarn` | ARN of the SSL certificate | `""` |
