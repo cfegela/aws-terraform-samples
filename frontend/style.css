@@ -1,0 +1,44 @@
+  body {
+    font: normal 0.9rem system-ui, sans-serif;
+    margin: 0.6rem 3.0rem;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #000000;
+    text-decoration: underline;
+    cursor: pointer; /* Changes the cursor to a hand icon */
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: #f8f8f8;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+  nav ul li a {
+    padding: 0.5rem 1rem;
+    display: block;
+    white-space: nowrap;
+  }
+
+  .error {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: #ffe0e0;
+    border-left: 4px solid #e74c3c;
+  }

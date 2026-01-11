@@ -175,6 +175,10 @@ The database is not publicly accessible. Connect via:
 ├── ec2.tf            # Utility EC2 instance
 ├── ecr.tf            # Container registries
 ├── ecs.tf            # ECS cluster, services, ALB
+├── frontend/         # Test UI for API access
+│   ├── index.html    # Dashboard with API response display
+│   ├── login.html    # Cognito authentication form
+│   └── style.css     # Shared styles
 ├── iam.tf            # GitHub Actions deploy user
 ├── lambda.tf         # Lambda functions and IAM
 ├── lambda/
@@ -188,6 +192,28 @@ The database is not publicly accessible. Connect via:
 ├── variables.tf      # Input variables
 └── vpc.tf            # VPC, subnets, routing
 ```
+
+## Frontend Test UI
+
+The `frontend/` directory contains a simple browser-based UI for testing Cognito authentication and API Gateway access. Built with [Alpine.js](https://alpinejs.dev/) for minimal dependencies.
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `login.html` | Login form that authenticates with Cognito using `USER_PASSWORD_AUTH` flow |
+| `index.html` | Dashboard that calls protected API endpoints using the stored JWT |
+| `style.css` | Shared stylesheet |
+
+### Usage
+
+1. Open `login.html` in a browser
+2. Enter Cognito user credentials
+3. On successful login, the JWT is stored in `localStorage` and you're redirected to `index.html`
+4. The dashboard automatically calls `GET /message/2` with the JWT in the Authorization header
+5. The API response is displayed on the page
+
+**Note:** The frontend currently routes API calls through a public CORS proxy (`test.cors.workers.dev`) to work around CORS configuration issues. This is for testing only and should not be used in production.
 
 ## Security Considerations
 

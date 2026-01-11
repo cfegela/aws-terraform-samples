@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sample</title>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="container" x-data="cognitoLogin()">
+  <h3>Sample</h3><p>
+
+  <form @submit.prevent="login">
+    <label for="username">
+      Username
+      <input type="text" id="username" x-model="username" required />
+    </label><p>
+
+    <label for="password">
+      Password&nbsp
+      <input type="password" id="password" x-model="password" required />
+    </label><p>
+
+    <button type="submit" :disabled="loading">
+      <span x-show="!loading">Login</span>
+      <span x-show="loading">Logging in...</span>
+    </button>
+  </form>
+
+  <!-- Show errors -->
+  <div x-show="error" class="error">
+    <strong>Error:</strong> <span x-text="error"></span>
+  </div>
+</main>
+
+<script>
+  function cognitoLogin() {
+    return {
+      username: '',
+      password: '',
+      clientId: '1djjdc5rrps152b2vltec80cmc',
+      error: '',
+      loading: false,
+
+      async login() {
+        this.loading = true;
+        this.error = '';
+
+        try {
+          const response = await fetch('https://cognito-idp.us-east-2.amazonaws.com', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-amz-json-1.1',
+              'X-Amz-Target': 'AWSCognitoIdentityProviderService.InitiateAuth'
+            },
+            body: JSON.stringify({
+              AuthParameters: {
+                USERNAME: this.username,
+                PASSWORD: this.password
+              },
+              AuthFlow: 'USER_PASSWORD_AUTH',
+              ClientId: this.clientId
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          const token = data?.AuthenticationResult?.IdToken;
+
+          if (!token) {
+            throw new Error('No IdToken returned');
+          }
+
+          // ✅ Store token securely (localStorage for demo — use cookies/secure storage in production)
+          localStorage.setItem('idToken', token);
+
+          // ✅ Redirect to index.html
+          window.location.href = 'index.html';
+
+        } catch (err) {
+          this.error = err.message;
+        } finally {
+          this.loading = false;
+        }
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
