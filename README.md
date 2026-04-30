@@ -53,7 +53,7 @@ terraform {
 
 ## Infrastructure Components
 
-### Networking (`vpc.tf`)
+### Networking (`modules/vpc`)
 
 - VPC with `/16` CIDR block
 - 3 public subnets (for ALB, NAT Gateway)
@@ -62,7 +62,7 @@ terraform {
 - NAT Gateway for private subnet internet access
 - Separate route tables for public and private subnets
 
-### ECS Fargate (`ecs.tf`)
+### ECS Fargate (`modules/ecs`)
 
 - ECS cluster with Fargate launch type
 - Nginx task definition with CloudWatch logging
@@ -71,7 +71,7 @@ terraform {
 - Deployment circuit breaker with automatic rollback
 - Sample batch task definition for background processing
 
-### Database (`rds.tf`)
+### Database (`modules/rds`)
 
 - PostgreSQL 17 on `db.t4g.large` instance
 - 100GB storage with auto-scaling up to 1TB
@@ -80,7 +80,7 @@ terraform {
 - Credentials stored in SSM Parameter Store (SecureString)
 - Private subnet placement (not publicly accessible)
 
-### Lambda Functions (`lambda.tf`)
+### Lambda Functions (`modules/lambda`)
 
 Three Lambda functions are configured:
 
@@ -90,7 +90,7 @@ Three Lambda functions are configured:
 
 All functions run in VPC private subnets with appropriate IAM permissions.
 
-### API Gateway (`api-gateway.tf`)
+### API Gateway (`modules/api-gateway`)
 
 HTTP API with the following routes:
 
@@ -103,21 +103,21 @@ HTTP API with the following routes:
 
 Authentication is handled by Amazon Cognito with JWT tokens.
 
-### Container Registries (`ecr.tf`)
+### Container Registries (`modules/ecr`)
 
 - `{projectname}-api` - Main API container images
 - `{projectname}-sample-task` - Batch task container images
 
 ### Storage and Messaging
 
-- **S3** (`s3.tf`) - `{projectname}-file-ingest` bucket for file uploads
-- **SQS** (`sqs.tf`) - FIFO queue with content-based deduplication
+- **S3** (`modules/s3`) - `{projectname}-file-ingest` bucket for file uploads
+- **SQS** (`modules/sqs`) - FIFO queue with content-based deduplication
 
-### IAM (`iam.tf`)
+### IAM (`modules/iam`)
 
 GitHub Actions deployment user with permissions to update Lambda function code.
 
-### EC2 (`ec2.tf`)
+### EC2 (`modules/ec2`)
 
 Utility EC2 instance in private subnet with SSM Session Manager access for administrative tasks.
 
@@ -171,26 +171,28 @@ The database is not publicly accessible. Connect via:
 
 ```
 .
-├── api-gateway.tf    # HTTP API, routes, Cognito auth
-├── ec2.tf            # Utility EC2 instance
-├── ecr.tf            # Container registries
-├── ecs.tf            # ECS cluster, services, ALB
+├── main.tf           # Root module — wires all child modules together
+├── state.tf          # Terraform backend config (S3)
+├── variables.tf      # Input variables
 ├── frontend/         # Test UI for API access
 │   ├── index.html    # Dashboard with API response display
 │   ├── login.html    # Cognito authentication form
 │   └── style.css     # Shared styles
-├── iam.tf            # GitHub Actions deploy user
-├── lambda.tf         # Lambda functions and IAM
 ├── lambda/
 │   ├── bedrock/      # Bedrock AI Lambda (Python)
 │   ├── ecs-task/     # ECS task trigger Lambda (Node.js)
 │   └── sample/       # Database query Lambda (Node.js)
-├── rds.tf            # PostgreSQL database
-├── s3.tf             # S3 bucket
-├── sqs.tf            # SQS FIFO queue
-├── state.tf          # Terraform backend config
-├── variables.tf      # Input variables
-└── vpc.tf            # VPC, subnets, routing
+└── modules/
+    ├── api-gateway/  # HTTP API, routes, Cognito auth
+    ├── ec2/          # Utility EC2 instance
+    ├── ecr/          # Container registries
+    ├── ecs/          # ECS cluster, services, ALB
+    ├── iam/          # GitHub Actions deploy user
+    ├── lambda/       # Lambda functions and IAM
+    ├── rds/          # PostgreSQL database
+    ├── s3/           # S3 bucket
+    ├── sqs/          # SQS FIFO queue
+    └── vpc/          # VPC, subnets, routing
 ```
 
 ## Frontend Test UI

@@ -4,5 +4,5 @@ resource "aws_ecr_repository" "api" {
 }
 
 resource "aws_ecr_repository" "sample-task" {
-  name         = "${var.projectname}-sample-task"
+  name = "${var.projectname}-sample-task"
 }

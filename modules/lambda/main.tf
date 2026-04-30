@@ -29,7 +29,6 @@ resource "aws_iam_policy" "lambda-iam-policy" {
           "sqs:*",
           "iam:*",
           "logs:*"
-
         ],
         "Resource" : [
           "*"
@@ -46,8 +45,8 @@ resource "aws_iam_role_policy_attachment" "lambda-iam-policy-attach" {
 
 data "archive_file" "sample" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda/sample"
-  output_path = "${path.module}/sample-function.zip"
+  source_dir  = "${path.root}/lambda/sample"
+  output_path = "${path.root}/sample-function.zip"
 }
 
 resource "aws_lambda_function" "sample" {
@@ -59,17 +58,17 @@ resource "aws_lambda_function" "sample" {
   runtime          = "nodejs22.x"
 
   vpc_config {
-    subnet_ids         = [aws_subnet.private_a.id, aws_subnet.private_b.id, aws_subnet.private_c.id]
-    security_group_ids = [aws_security_group.ecs_alb.id]
+    subnet_ids         = [var.private_subnet_a_id, var.private_subnet_b_id, var.private_subnet_c_id]
+    security_group_ids = [var.ecs_alb_sg_id]
   }
 
   environment {
     variables = {
-      DB_HOST     = element(split(":", aws_db_instance.db.endpoint), 0)
+      DB_HOST     = element(split(":", var.db_endpoint), 0)
       DB_PORT     = "5432"
       DB_NAME     = "postgres"
-      DB_USER     = random_password.dbuser.result
-      DB_PASSWORD = random_password.dbpass.result
+      DB_USER     = var.db_username
+      DB_PASSWORD = var.db_password
     }
   }
 
@@ -82,8 +81,8 @@ resource "aws_lambda_function" "sample" {
 
 data "archive_file" "bedrock-sample" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda/bedrock"
-  output_path = "${path.module}/bedrock-function.zip"
+  source_dir  = "${path.root}/lambda/bedrock"
+  output_path = "${path.root}/bedrock-function.zip"
 }
 
 resource "aws_lambda_function" "bedrock-sample" {
@@ -93,17 +92,17 @@ resource "aws_lambda_function" "bedrock-sample" {
   handler          = "bedrock.lambda_handler"
   source_code_hash = data.archive_file.bedrock-sample.output_base64sha256
   runtime          = "python3.13"
-  timeout = 60
+  timeout          = 60
   vpc_config {
-    subnet_ids         = [aws_subnet.private_a.id, aws_subnet.private_b.id, aws_subnet.private_c.id]
-    security_group_ids = [aws_security_group.ecs_alb.id]
+    subnet_ids         = [var.private_subnet_a_id, var.private_subnet_b_id, var.private_subnet_c_id]
+    security_group_ids = [var.ecs_alb_sg_id]
   }
 }
 
 data "archive_file" "ecs-task-sample" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda/ecs-task"
-  output_path = "${path.module}/ecs-task-function.zip"
+  source_dir  = "${path.root}/lambda/ecs-task"
+  output_path = "${path.root}/ecs-task-function.zip"
 }
 
 resource "aws_lambda_function" "ecs-task-sample" {
@@ -114,7 +113,7 @@ resource "aws_lambda_function" "ecs-task-sample" {
   source_code_hash = data.archive_file.ecs-task-sample.output_base64sha256
   runtime          = "nodejs22.x"
   vpc_config {
-    subnet_ids         = [aws_subnet.private_a.id, aws_subnet.private_b.id, aws_subnet.private_c.id]
-    security_group_ids = [aws_security_group.ecs_alb.id]
+    subnet_ids         = [var.private_subnet_a_id, var.private_subnet_b_id, var.private_subnet_c_id]
+    security_group_ids = [var.ecs_alb_sg_id]
   }
 }

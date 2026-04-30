@@ -51,9 +51,9 @@ resource "aws_ecs_service" "ecs_service" {
       aws_security_group.ecs_alb.id,
     ]
     subnets = [
-      aws_subnet.private_a.id,
-      aws_subnet.private_b.id,
-      aws_subnet.private_c.id,
+      var.private_subnet_a_id,
+      var.private_subnet_b_id,
+      var.private_subnet_c_id,
     ]
   }
   load_balancer {
@@ -75,7 +75,7 @@ resource "aws_lb_target_group" "ecs_target_group" {
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
   health_check {
     enabled  = true
     path     = "/"
@@ -88,9 +88,9 @@ resource "aws_alb" "ecs_alb" {
   internal           = false
   load_balancer_type = "application"
   subnets = [
-    aws_subnet.public_a.id,
-    aws_subnet.public_b.id,
-    aws_subnet.public_c.id,
+    var.public_subnet_a_id,
+    var.public_subnet_b_id,
+    var.public_subnet_c_id,
   ]
   security_groups = [
     aws_security_group.ecs_alb.id
@@ -125,7 +125,7 @@ resource "aws_alb_listener" "http_listener" {
 
 resource "aws_security_group" "ecs_alb" {
   name   = "${var.projectname}-ecs-alb"
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = var.vpc_id
 
   ingress {
     from_port   = 80

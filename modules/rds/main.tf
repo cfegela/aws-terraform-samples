@@ -33,18 +33,18 @@ resource "aws_ssm_parameter" "dbhost" {
 resource "aws_db_subnet_group" "private" {
   name = "${var.projectname}-priv-subnet-group"
   subnet_ids = [
-    aws_subnet.private_a.id,
-    aws_subnet.private_b.id,
-    aws_subnet.private_c.id,
+    var.private_subnet_a_id,
+    var.private_subnet_b_id,
+    var.private_subnet_c_id,
   ]
 }
 
 resource "aws_db_subnet_group" "public" {
   name = "${var.projectname}-pub-subnet-group"
   subnet_ids = [
-    aws_subnet.public_a.id,
-    aws_subnet.public_b.id,
-    aws_subnet.public_c.id,
+    var.public_subnet_a_id,
+    var.public_subnet_b_id,
+    var.public_subnet_c_id,
   ]
 }
 
@@ -81,7 +81,7 @@ resource "aws_db_parameter_group" "parameter_group" {
 }
 
 resource "aws_security_group" "postgres" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = var.vpc_id
   name   = "${var.projectname}-db-sg"
 
   ingress {

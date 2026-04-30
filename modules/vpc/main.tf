@@ -94,8 +94,7 @@ resource "aws_internet_gateway" "igw" {
 
 resource "aws_eip" "nat" {
   domain = "vpc"
-  # vpc = true
-  tags = { "Name" = "${var.projectname}-ngw-eip" }
+  tags   = { "Name" = "${var.projectname}-ngw-eip" }
 }
 
 resource "aws_nat_gateway" "ngw" {
